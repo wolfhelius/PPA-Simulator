@@ -12,9 +12,6 @@ global nextPID, nextCID
 nextPID = 0
 nextCID = 0
 
-global flattop
-flattop = True
-
 nP = 1
 nC = 10
 
@@ -30,15 +27,14 @@ for iP in range(nP):
 
         # initialize cohorts
         C = tile.patch[iP].cohort[iC]
-        C.species = SpeciesList[randint(0,nSpp-1)]
-        C.startyear = year
+        #C.species = SpeciesList[randint(0,2-1)]
+        C.species = SpeciesList[randint(0,1)]
         D = 10*random()
         C.dbh.append(D)
         C.UpdateH()
         C.nindivs.append(0.05)
         tile.patch[iP].cohort[iC] = C
 
-    tile.patch[iP].FindZstar()
     tile.patch[iP].Relayer()
 
 

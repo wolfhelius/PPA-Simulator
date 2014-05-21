@@ -40,9 +40,8 @@ for iP in range(nP):
         C.UpdateB()
         tile.patch[iP].cohort[iC] = C
 
-	tile.patch[iP].FindZstar()
     tile.patch[iP].Relayer()
-    tile.patch[iP].MargeCohorts()
+    tile.patch[iP].MergeCohorts()
 
 # run the simulation
 for iT in range(nYear*dt):
@@ -84,9 +83,8 @@ for iT in range(nYear*dt):
         tile.patch[iP] = P
 
         if ((iT % 1/dt) == 0):
-	        tile.patch[iP].FindZstar()
 	        tile.patch[iP].Relayer()
-	        tile.patch[iP].MargeCohorts()
+	        tile.patch[iP].MergeCohorts()
 
 
 

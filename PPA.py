@@ -1,6 +1,8 @@
 # PPA Class Defs
 from math import pi, log10
 
+import numpy as np
+
 class Species:
     def __init__(self, id):
         self.sid = 1
@@ -26,19 +28,97 @@ class Tile:
         self.patch = []
 
 class Patch:
+
+    global flattop
+    flattop = True
+
     def __init__(self, id):
         self.pid = id
         self.cohort = []
         self.Zstar = []
 
     def MergeCohorts(self):
+        maxC = 20
+
+        CC = self.cohort
+        CC = sorted(CC, key=lambda cohort: cohort.dbh[-1], reverse=True)
+
+        maxD = log(CC[0].dbh[-1])
+        minD = log(CC[-1].dbh[-1])
+        Dedges, dD = np.linspace(maxD, minD, num=maxC+1, retstep=True)
+
+        nL = self.cohort[-1].layer[-1]
+
+        SS = []
+        for C in CC:
+            SS.append(C.species)
+
+        # SS = [SS.append(C.species) for C in CC]
+        SS = set(SS)
+        nS = len(SS)
+
+        # the list where the merged cohorts will be pushed
+        CM = []
+
+        for iS in range(nS):
+            for iL in range (nL):
+                CSL = []
+                for C in CC:
+                    if (C.species == SS[iS]) & (C.layer[-1] = iL):
+                        CSL.append(C)
+                iD = 0
+                iC = 0
+                while (True):
+                    # base case
+                    if (iC == len(CSL)):
+                        break
+
+                    C = CSL[iC]
+
+                    # make upper range boundary above or equal current cohort
+                    # iD is upper range boundary
+                    if (C.dbh[-1]>Dedges[iD]):
+                        iD += 1
+                    else:
+                        break
+
+                    while (True):   
+                        # Gobble smaller cohorts in same size class
+                        if (iC+1 < len(CSL)) & (CSL[iC+1].dbh[-1] >=Dedges[iD]):                            
+                            C.Merge(CSL[iC+1])
+                            iC += 1
+                        else:
+                            # Finish if no smaller cohorts, or no more cohorts at all
+                            CM.append(C)
+                            iC += 1
+                            break
+                for iC in range(len(CSL)):
+                    CM.append(CSL[iC])
+
+        self.cohort = CM
 
     def Relayer(self):
         # Allows for multiple layers, assumes Zstar and crown areas known a priori
+        # Updates Patch.Zstar
         # Updates Patch.Cohort array with new array, including any splits
         # Updates Cohort.Layer
-        #self.cohort = sorted(self.cohort, key=lambda cohort: cohort.height[-1], reverse=True)
+
+        self.cohort = sorted(self.cohort, key=lambda cohort: cohort.height[-1], reverse=True)
         nC = len(self.cohort)
+
+        global flattop
+        if (not(flattop)):
+            self.FindZstar()
+        else:
+            for iC in range(nC):
+                C = self.cohort[iC]
+                D = C.dbh[-1]
+                S = C.species
+                phi = S.R40/40
+                R = phi*D
+                C.crownarea.append(pi*R**2) 
+                self.cohort[iC] = C
+
         CC = [] # temporary structure to allow splitting
         GA = 0
         layer = 0
@@ -65,9 +145,7 @@ class Patch:
 
     def FindZstar(self):
         # Allows for only a single Zstar
-        # Updates Patch.Zstar
         # Updates Patch.Cohort.Crownarea
-        self.cohort = sorted(self.cohort, key=lambda cohort: cohort.height[-1], reverse=True)
         nC = len(self.cohort)
         iZ0 = 0
         iZ1 = nC-1
@@ -101,8 +179,6 @@ class Patch:
                 else:
                     # if iZ1 is the final cohort, then sum(CA)< GA
                     Zstar = 0
-
-                self.Zstar.append(Zstar)
 
                 # Zstar in hand, get crown areas
                 # Sum(CA)<GA because "true" Zstar is between iZ0 and iZ1
@@ -213,6 +289,6 @@ class Cohort:
             else:
                 return 0        
 
-    def __repr__(self):
-        return repr((self.cid, self.dbh, self.height, self.crownarea, self.layer))
+    # def __repr__(self):
+    #     return repr((self.cid, self.dbh, self.height, self.crownarea, self.layer))
 

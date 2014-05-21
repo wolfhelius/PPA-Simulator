@@ -1,24 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on May 14, 2014
-
-@author: adamwolf
-"""
-
-"""
-"Species": [
-    {
-    "id" = 1
-    "species" = 3
-    "startyear" = 1950 # make this into a datetime
-    "age" : []
-    "bl" : []
-    "bw" : []    
-    }
-    ]
-
-"""
-    
 class Species:
     def __init__(self, id):
     	self.sid = 1
@@ -28,10 +7,12 @@ class Species:
         self.MUu = 0
         self.Fc = 0
         self.Fu = 0
-        self.alpha_H_D = 0
-        self.beta_H_D = 0
-        self.alpha_CR_D = 0
-        self.beta_CR_D = 0
-        self.Vmax = 0
+        self.aH = 0
+        self.bH = 0
+        self.Vm = 0
         self.k = 0.5
         self.LUE = 0
+        self.B = 0;
+        self.Ro = 0
+        self.R40 = 0
+        self.V = 0

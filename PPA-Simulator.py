@@ -21,7 +21,6 @@ nextPID += 1
 tile.patch[0].cohort[0] = Cohort(nextCID)
 nextCID += 1
 
-
 # initialize cohorts
 tile.patch[0].cohort[0].species = Species(0)
 tile.patch[0].cohort[0].startyear = year
@@ -65,8 +64,12 @@ for iT in range(nYear*dt):
 				Cnew.species = S # if we wanted evolution it would happen here
 				Cnew.dbh[0] = 1
 				Cnew.nindivs[0] = F * C.crownarea[iT+1]*C.nindivs[iT+1]
+				Cnew.startyear = iT+1
 				Cnew.UpdateBiomassAllometrically()
 				P.cohorts.push(Cnew)
+				
+			P.cohort[iC] = C
+		tile.patch[iP] = P
 
 
 

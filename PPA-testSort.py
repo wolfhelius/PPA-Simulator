@@ -1,7 +1,6 @@
 # Initial Development of PPA Forest Dynamics Simulator
 
 from random import random, randint
-# from math import pi, log10
 
 from PPA import *
 
@@ -9,13 +8,12 @@ from MakeSpecies import MakeSpecies
 
 SpeciesList, nSpp = MakeSpecies()
 
-# run parameters
-year = 0
-dt = 0.2 # years
-nYear = 100
 global nextPID, nextCID
 nextPID = 0
 nextCID = 0
+
+global flattop
+flattop = True
 
 nP = 1
 nC = 10
@@ -36,8 +34,7 @@ for iP in range(nP):
         C.startyear = year
         D = 10*random()
         C.dbh.append(D)
-        Zstar = 0
-        C.UpdateH(Zstar)
+        C.UpdateH()
         C.nindivs.append(0.05)
         tile.patch[iP].cohort[iC] = C
 

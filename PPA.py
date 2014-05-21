@@ -31,6 +31,8 @@ class Patch:
         self.cohort = []
         self.Zstar = []
 
+    def MergeCohorts(self):
+
     def Relayer(self):
         # Allows for multiple layers, assumes Zstar and crown areas known a priori
         # Updates Patch.Cohort array with new array, including any splits
@@ -151,13 +153,18 @@ class Cohort:
         self.nsc=[]
         self.bl=[]
         
-    def UpdateH(self, Z):
+    def UpdateH(self):
         D = self.dbh[-1]
         S = self.species
         logH = S.aH + S.bH*log10(D)
         H = 10**logH
         self.height.append(H)
 
+    def UpdateB(self):
+        # stub for update biomass
+        D = self.dbh[-1]
+        S = self.species
+        
 
     def Split(self, ratio):
         global nextPID, nextCID

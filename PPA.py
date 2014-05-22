@@ -277,6 +277,27 @@ class Cohort:
 
         return C
 
+    def Merge(self, C2)
+        C = self
+
+        C.nindivs=self.nindivs + C2.nindivs
+
+        C.bliving=(self.bliving*self.nindivs + C2.bliving*C2.nindivs) / C.nindivs
+        C.br=(self.br*self.nindivs + C2.br*C2.nindivs) / C.nindivs
+        C.bseed=(self.bseed*self.nindivs + C2.bseed*C2.nindivs) / C.nindivs
+        C.bsw=(self.bsw*self.nindivs + C2.bsw*C2.nindivs) / C.nindivs
+        C.bwood=(self.bwood*self.nindivs + C2.bwood*C2.nindivs) / C.nindivs
+        C.crownarea=(self.crownarea*self.nindivs + C2.crownarea*C2.nindivs) / C.nindivs
+        C.height=(self.height*self.nindivs + C2.height*C2.nindivs) / C.nindivs
+        C.nsc=(self.nsc*self.nindivs + C2.nsc*C2.nindivs) / C.nindivs
+        C.bl=(self.bl*self.nindivs + C2.bl*C2.nindivs) / C.nindivs
+
+        # calc dbh to maintain BA
+        BA = pi*(self.dbh/2)**2 + pi*(C2.dbh/2)**2
+        C.dbh=sqrt((BA/C.nindivs)/pi)*2
+
+        self = C
+
     # https://docs.python.org/2/reference/datamodel.html
     def __cmp__(self, other):
 

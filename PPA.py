@@ -1,6 +1,5 @@
 # PPA Class Defs
 from math import pi, log10
-
 import numpy as np
 
 class Species:
@@ -22,6 +21,10 @@ class Species:
         self.R40 = 0
         self.V = 0
 
+        # cf soil water uptake
+        self.srl = 24.4 # m/kg C
+        self.root_rad = 0.00029 # m
+
 class Tile:
     def __init__(self, id):
         self.tid = id
@@ -38,6 +41,7 @@ class Patch:
         self.Zstar = []
 
     def MergeCohorts(self):
+        
         maxC = 20
 
         CC = self.cohort
@@ -47,7 +51,10 @@ class Patch:
         minD = log(CC[-1].dbh[-1])
         Dedges, dD = np.linspace(maxD, minD, num=maxC+1, retstep=True)
 
-        nL = self.cohort[-1].layer[-1]
+        for iD in range(len(Dedges)):
+            Dedges[iD] = exp(Dedges[iD])
+
+        nL = CC[-1].layer[-1]
 
         SS = []
         for C in CC:
@@ -66,8 +73,8 @@ class Patch:
                 for C in CC:
                     if (C.species == SS[iS]) & (C.layer[-1] = iL):
                         CSL.append(C)
-                iD = 0
-                iC = 0
+                iD = 0 # diameter bin index
+                iC = 0 # cohort array index
                 while (True):
                     # base case
                     if (iC == len(CSL)):
@@ -92,8 +99,8 @@ class Patch:
                             CM.append(C)
                             iC += 1
                             break
-                for iC in range(len(CSL)):
-                    CM.append(CSL[iC])
+                # for iC in range(len(CSL)):
+                #     CM.append(CSL[iC])
 
         self.cohort = CM
 
@@ -115,8 +122,10 @@ class Patch:
                 D = C.dbh[-1]
                 S = C.species
                 phi = S.R40/40
-                R = phi*D
-                C.crownarea.append(pi*R**2) 
+                CA = phi*D**1.5
+                #R = phi*D
+                #C.crownarea.append(pi*R**2) 
+                C.crownarea.append(CA)
                 self.cohort[iC] = C
 
         CC = [] # temporary structure to allow splitting
@@ -249,31 +258,9 @@ class Cohort:
         C.cid = nextCID
         nextCID += 1
 
-        self.bliving=self.bliving*ratio
-        self.br=self.br*ratio
-        self.bseed=self.bseed*ratio
-        self.bsw=self.bsw*ratio
-        self.bwood=self.bwood*ratio
-        self.crownarea=self.crownarea*ratio
-        self.dbh=self.dbh*ratio
-        self.height=self.height*ratio
-        self.layer=self.layer*ratio
-        self.nindivs=self.nindivs*ratio
-        self.nsc=self.nsc*ratio
-        self.bl=self.bl*ratio
+        self.nindivs[-1]=self.nindivs[-1]*ratio
 
-        C.bliving=C.bliving*(1-ratio)
-        C.br=C.br*(1-ratio)
-        C.bseed=C.bseed*(1-ratio)
-        C.bsw=C.bsw*(1-ratio)
-        C.bwood=C.bwood*(1-ratio)
-        C.crownarea=C.crownarea*(1-ratio)
-        C.dbh=C.dbh*(1-ratio)
-        C.height=C.height*(1-ratio)
-        C.layer=C.layer*(1-ratio)
-        C.nindivs=C.nindivs*(1-ratio)
-        C.nsc=C.nsc*(1-ratio)
-        C.bl=C.bl*(1-ratio)
+        C.nindivs[-1]=C.nindivs[-1]*(1-ratio)
 
         return C
 
@@ -312,4 +299,29 @@ class Cohort:
 
     # def __repr__(self):
     #     return repr((self.cid, self.dbh, self.height, self.crownarea, self.layer))
+
+class Soil:
+    def __init__(self):
+            self.type = 0
+            self.depth = 0
+            self.fwfps = [] # state variable, ranges 0-1
+            self.psi = [] # state variable, units MPa
+            self.evap = 0 # flux
+            self.leach = 0 # flux
+            self.uptake = 0 # flux
+            self.R = 0 # state variablem half distance between roots
+
+class SoilType:
+    def __init__(self, id):
+            self.id = id
+            self.name = 'Loam'
+            self.vwc_wilt = 0
+            self.vwc_fc = 0
+            self.vwc_sat = 0
+            self.vlc_min = 0
+            self.awc_lm2 = 0
+            self.k_sat_ref = 0
+            self.psi_sat_ref = 0
+            self.chb = 0
+            self.alpha = 0
 

@@ -1,7 +1,6 @@
+from PPA import Species
 import numpy as np
 import json
-from Species import Species
-
 
 def MakeSpecies():
 	# Purves et al crown envelope allometry
